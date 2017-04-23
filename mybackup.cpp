@@ -105,13 +105,13 @@ string UpDataTime(TCHAR* src) {
 	FILETIME ftCreate, ftAccess, ftWrite;
 	SYSTEMTIME stUTC, stLocal, stUTC1, stLocal1, stUTC2, stLocal2;
 
-	hFile1 = CreateFile((LPCTSTR)fname,								 //file to open 
-		GENERIC_READ | GENERIC_WRITE,								 //open for reading 
-		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,      //share for reading 
-		NULL,														 //default security 
-		OPEN_ALWAYS,											     //existing file only 
-		FILE_FLAG_BACKUP_SEMANTICS,									 // normal file 
-		NULL);														 //no attribute template 
+	hFile1 = CreateFile((LPCTSTR)fname,	//file to open 
+		GENERIC_READ | GENERIC_WRITE, //open for reading 
+		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //share for reading 
+		NULL, //default security 
+		OPEN_ALWAYS, //existing file only 
+		FILE_FLAG_BACKUP_SEMANTICS, // normal file 
+		NULL); //no attribute template 
 
 	if (hFile1 == INVALID_HANDLE_VALUE) {
 		printf("Could not open %s file, error %d\n", fname, GetLastError());
@@ -128,13 +128,19 @@ string UpDataTime(TCHAR* src) {
 	FileTimeToSystemTime(&ftWrite, &stUTC2);
 	SystemTimeToTzSpecificLocalTime(NULL, &stUTC2, &stLocal2);
 
-	//Build a string showing the date and time.
 	
 	printf("Last written: %d/%02d/%02d %02d:%02d\n", stLocal2.wYear, stLocal2.wMonth,
 		stLocal2.wDay, stLocal2.wHour, stLocal2.wMinute);
 
-	string data= to_string(stLocal2.wYear) + to_string(stLocal2.wMonth) + to_string(stLocal2.wDay)
-		+ to_string(stLocal2.wHour) + to_string(stLocal2.wMinute);
+	string data = to_string(stLocal2.wYear);
+	if (stLocal2.wMonth < 10) {	data = data + "0" + to_string(stLocal2.wMonth);}
+	else { data = data + to_string(stLocal2.wMonth);}
+	if (stLocal2.wDay < 10) { data = data + "0" + to_string(stLocal2.wDay); }
+	else { data = data + to_string(stLocal2.wDay); }
+	if (stLocal2.wHour < 10) { data = data + "0" + to_string(stLocal2.wHour); }
+	else { data = data + to_string(stLocal2.wHour); }
+	if (stLocal2.wMinute < 10) { data = data + "0" + to_string(stLocal2.wMinute); }
+	else { data = data + to_string(stLocal2.wMinute); }
 
 	CloseHandle(hFile1);
 
@@ -142,7 +148,7 @@ string UpDataTime(TCHAR* src) {
 }
 
 //src와 dest의 시간을 비교. **특정 파일만 확인하고 업데이트 하는 것이 아니라
-//							 경로 안의 모든 파일 다 업데이트..
+//경로 안의 모든 파일 다 업데이트..
 void CompareTime(TCHAR* src, TCHAR* dest) {
 	string updatefile = UpDataTime(src);
 	string backupfile = UpDataTime(dest);
@@ -167,7 +173,15 @@ void write_text_to_log_file(TCHAR *fileName)
 
 	//TCHAR to char
 	char fName[MAX_PATH];
-	WideCharToMultiByte(CP_ACP, 0, fileName, MAX_PATH, fName, MAX_PATH, NULL, NULL);
+	WideCharToMultiByte(CP_ACP, //Code page to use in performing the conversion
+		0, //dwFlags is conversion type
+		fileName, //lpWideCharStr
+		MAX_PATH, //cccWideChar
+		fName, //lpMultiByteStr
+		MAX_PATH, //cbMultiByte
+		NULL, //lpDefaultChar
+		NULL);//lpUsedDefaultChar
 	
 	log_file << fName << endl;
+	log_file.close();
 }
