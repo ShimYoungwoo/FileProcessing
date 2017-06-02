@@ -323,7 +323,7 @@ tmp->setNext(newt); //linked list 연결
 depth = depth + 1;
 }
 */
-treeNode* BplusTree::split(treeNode *tmp) {   //아 스플릿 개씨발ㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹㄹ
+treeNode* BplusTree::split(treeNode *tmp) {   //스플릿
 	int p;   //split될 기준 item 위치
 	p = tmp->getSize() / 2;
 
